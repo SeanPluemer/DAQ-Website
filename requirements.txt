@@ -1,0 +1,11 @@
+
+streamlit
+gwosc
+gwpy
+matplotlib
+astropy
+numpy
+
+pandas
+altairs
+requests
