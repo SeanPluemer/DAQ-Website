@@ -1,1 +1,4 @@
 ﻿Signal Name,Used?,Physical Units,Source,Type,% Error,Range [Max],Range [Min],Fwd EU Expression,Rvr EU Expression,Uncertainty Expression,Fwd EU Calibration Points,Rvr EU Calibration Points,Notes
+Signal1,Used,Volts,TBD,DC_Voltage,,,,,,,,,
+Signal 2,Used,Volts,TBD,DC_Voltage,,,,,,,,,
+Add signal,Used,Volts,TBD,DC_Voltage,,,,,,,,,
