@@ -1,17 +1,11 @@
-import time
 from datetime import datetime
-# import datetime
-from random import random
-
-import numpy as np
 import streamlit as st
-import src.test_configs
-import csv_manipulation
 import os
 import csv
 import pandas as pd
 import glob
 import shutil
+from src.programs import connect_to_pi
 
 os.chdir("/Users/seanpluemer/Documents/GitHub/DAQ-Website")
 
@@ -47,6 +41,7 @@ def app():
     os.chdir("/Users/seanpluemer/Documents/GitHub/DAQ-Website")
     with st.spinner("Loading  ..."):
         # Title the app
+
         st.title('DAQ Import Config')
         ###################Start Test config settings#######################
         path = "src/test_configs"
@@ -104,6 +99,20 @@ def app():
                 st.write(signal_selection_dataframe)
                 #st.write(signal_selection_dataframe.columns.values.tolist())
                 #todo I dont need this right now, but this might be useful in the future
+
+
+#this is where the data is getting sent to the raspberry pi
+        if signal_config_selection_name != "New Config" and test_config_selection_name != "New Config":
+            if st.button("Start Test"):
+                pi_status = st.write("Connecting to pi")
+
+                pi_path = '/home/pi/learning_connection'
+                signal_path =  "/Users/seanpluemer/Documents/GitHub/DAQ-Website/src/signal_configs/" + signal_config_selection_name
+                test_path =  "/Users/seanpluemer/Documents/GitHub/DAQ-Website/src/test_configs/" + test_config_selection_name
+                connect_to_pi.copy_files(signal_path, test_path, pi_path)
+                connect_to_pi.run_cmd("python3  demo.py " + signal_config_selection_name + " " + test_config_selection_name, pi_path )
+                del pi_status
+                pi_status = st.write("connected") #todo, i was right here (12/21)
 
 
 
