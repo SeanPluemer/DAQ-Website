@@ -15,8 +15,9 @@ def import_signal_config(csv_file_name, path):
 
     os.chdir(path)
 
-    df = pd.read_csv(csv_file_name)
+    df = pd.read_csv(csv_file_name,index_col=False)
     os.chdir("/Users/seanpluemer/Documents/GitHub/DAQ-Website")
+    print(type(df))
     return df
 
 def import_test_config(csv_file_name, path):
@@ -24,17 +25,11 @@ def import_test_config(csv_file_name, path):
     os.chdir(homepath)
 
     os.chdir(path)
-    file = open(csv_file_name)
-    csvreader = csv.reader(file)
-    header = []
-    header = next(csvreader)
 
-    rows = []
-    for row in csvreader:
-        rows.append(row)
-
+    df = pd.read_csv(csv_file_name)
     os.chdir("/Users/seanpluemer/Documents/GitHub/DAQ-Website")
-    return header, rows
+    return df
+
 
 def app():
     # print(os.getcwd())
@@ -70,6 +65,7 @@ def app():
             if show_test_config_checkbox:  # or test_config_selection_name == "New Config": #todo make new config get rid of checkbox
                 st.write(test_config_selection_dataframe)
 
+
 ###################End  Test config settings#######################
         ###################Start Signal config settings#######################
         path = "src/signal_configs"
@@ -96,6 +92,7 @@ def app():
             # TODO I was unable to make this work dynamically, so right now i am just doing it manually
             show_signal_config_checkbox = st.checkbox('Click to view singal parameters')
             if show_signal_config_checkbox or signal_config_selection_name == "New Config":  # todo make new config get rid of checkbox
+                print(type(signal_selection_dataframe))
                 st.write(signal_selection_dataframe)
                 #st.write(signal_selection_dataframe.columns.values.tolist())
                 #todo I dont need this right now, but this might be useful in the future
@@ -106,13 +103,18 @@ def app():
             if st.button("Start Test"):
                 pi_status = st.write("Connecting to pi")
 
-                pi_path = '/home/pi/learning_connection'
+                pi_path = '/home/pi/DAQ_Tests/files_from_server'
                 signal_path =  "/Users/seanpluemer/Documents/GitHub/DAQ-Website/src/signal_configs/" + signal_config_selection_name
                 test_path =  "/Users/seanpluemer/Documents/GitHub/DAQ-Website/src/test_configs/" + test_config_selection_name
-                connect_to_pi.copy_files(signal_path, test_path, pi_path)
-                connect_to_pi.run_cmd("python3  demo.py " + signal_config_selection_name + " " + test_config_selection_name, pi_path )
+                connect_to_pi.copy_files_to_pi(signal_path, test_path, pi_path)
+                #connect_to_pi.run_cmd("python3  demo.py " + signal_config_selection_name + " " + test_config_selection_name, pi_path )
                 del pi_status
                 pi_status = st.write("connected") #todo, i was right here (12/21)
+
+        if st.button("pull data"):
+            pi_path = '/home/pi/learning_connection/'
+            connect_to_pi.copy_files_from_pi("test.txt", pi_path)
+
 
 
 
@@ -142,10 +144,12 @@ def make_new_test(template_data_frame):
         FileStats_text_input = st.text_input("File Stats")
         AllStats_text_input = st.text_input("All Stats")
         test_notes = st.text_input("Notes (not used for test)")
+        st.write(UpdateRate_text_input)
         joined_string = [SamplingRate_text_input, NumOfAvg_text_input, UpdateRate_text_input, RecMode_text_input, RecRate_text_input,
                          RecMode_text_input, StartTime_text_input, StopTime_text_input, StartDate_text_input, StopDate_text_input,
                          FileSignals_text_input,
                          FileStats_text_input, AllStats_text_input, test_notes]
+        st.write(joined_string)
 
         submitted = st.form_submit_button("Finish")
 
@@ -161,7 +165,7 @@ def make_new_test(template_data_frame):
 def make_new_signal(template_data_frame):
 #    st.write(template_data_frame)
 
-    new_file_name = st.text_input("What do you want to name this config")#todo, make sure this is an okay name
+    new_signal_file_name = st.text_input("What do you want to name this config")#todo, make sure this is an okay name
     with st.form("signal_form", clear_on_submit=True):
 
         signal_name = st.text_input("Name of signal")
@@ -186,6 +190,7 @@ def make_new_signal(template_data_frame):
         joined_string = [signal_name, signal_used, physical_units, signal_source, signal_type,
                 signal_error,max_range,min_range,fwd_eu_expression,rvr_Eu_expression,uncertainty_expression,
                 fwd_eu_calibration,rvr_eu_calibration,signal_notes]
+        st.write(joined_string)
 
 
         submitted = st.form_submit_button("Save Signal")
@@ -203,7 +208,7 @@ def make_new_signal(template_data_frame):
             st.write(import_signal_config("tempcsvdata.csv", "src/signal_configs"))
 
     if st.button("Finish"):
-        os.rename("src/signal_configs/tempcsvdata.csv", "src/signal_configs/"+new_file_name)
+        os.rename("src/signal_configs/tempcsvdata.csv", "src/signal_configs/"+new_signal_file_name)
 
     return template_data_frame
 
