@@ -1,2 +1,0 @@
-﻿SamplingRate,NumOfAvg,UpdateRate,RecRate,RecRateUnits,RecMode,StartTime,StopTime,StartDate,StopDate,FileSignals,FileStats,AllStats
-thisis a test,100,1000,Continuous,100,Continuous,11:09:00.106450,11:09:00.106450,2021-12-22,2021-12-22,signal 1,,,

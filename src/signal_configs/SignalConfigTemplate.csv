@@ -1,1 +1,1 @@
-﻿Signal Name,Used?,Physical Units,Source,Type,% Error,Range [Max],Range [Min],Fwd EU Expression,Rvr EU Expression,Uncertainty Expression,Fwd EU Calibration Points,Rvr EU Calibration Points,Notes
+﻿Signal_Name,Used?,Physical_Units,Channel,Type,%_Error,Range_[Max],Range_[Min],Fwd_EU_Expression,Rvr_EU_Expression,Uncertainty_Expression,Fwd_EU_Calibration_Points,Rvr_EU_Calibration_`Points,Notes

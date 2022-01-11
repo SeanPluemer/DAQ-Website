@@ -17,7 +17,14 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="/src/signal_configs/hellothere.csv">
+        <entry key="/src/signal_configs/first_signal_test.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/src/test_configs/BlankTestConfigTemplate.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -31,17 +38,17 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="/src/test_configs/demo1.csv">
+        <entry key="/src/test_configs/First_test.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
-        <entry key="/src/test_configs/hellothere.csv">
+        <entry key="/test.csv">
           <value>
             <Attribute>
-              <option name="separator" value="," />
+              <option name="separator" value=":" />
             </Attribute>
           </value>
         </entry>
