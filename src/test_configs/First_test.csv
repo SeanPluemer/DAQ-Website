@@ -1,1 +1,2 @@
 ﻿SamplingRate,NumOfAvg,UpdateRate,RecRate,RecRateUnits,RecMode,TestTime,FileStats,AllStats,Notes
+1000,1,10,Continuous,1,Continuous,10,,,this is a test
