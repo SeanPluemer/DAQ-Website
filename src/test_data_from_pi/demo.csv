@@ -1,0 +1,17 @@
+Operator:	Sean Pluemer
+Station ID:	raspberry pi 1
+PC Name:	raspberry pi
+DC Configuration:	dc_configuration
+AC Configuration:	dc_configuration
+
+Comments: HELLO WORLD, THIS IS A COMMENT
+
+Calibration File:	nan
+Output Data:
+
+                  date  temp
+2010-01-01 00:00:00  39.4
+2010-01-01 01:00:00  39.2
+2010-01-01 02:00:00  39.0
+2010-01-01 03:00:00  38.9
+2010-01-01 04:00:00  38.8

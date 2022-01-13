@@ -50,7 +50,8 @@ def app():
         st.write("Import the configuration das file.")
         list_of_test_configs = []
         for list in glob.glob("src/test_configs/*.csv"):  # todo might need some logic in herre to get rid of "blank" template
-            list_of_test_configs.append(list[17:])
+            print(list)
+            list_of_test_configs.append(list[17:]) #the 17: crops out "src/test_configs/"
         test_config_selection_name = st.selectbox("Select the test config file", ("New Config", *list_of_test_configs))
         if test_config_selection_name == "New Config":
             show_new_test_config_checkbox = st.checkbox('Click to input new Test ')

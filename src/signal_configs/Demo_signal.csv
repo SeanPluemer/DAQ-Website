@@ -1,0 +1,3 @@
+﻿Signal_Name,Used?,Physical_Units,Channel,Type,%_Error,Range_[Max],Range_[Min],Fwd_EU_Expression,Rvr_EU_Expression,Uncertainty_Expression,Fwd_EU_Calibration_Points,Rvr_EU_Calibration_`Points,Notes
+Signal 1,Used,Volts,0,DC_Voltage,1,10,-10,,,,,,Hello world
+Signal 2 ,Used,Amps,1,DC_Voltage,0,10,-10,,,,,,This is an amp
