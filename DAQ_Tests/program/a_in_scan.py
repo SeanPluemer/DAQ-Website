@@ -132,6 +132,7 @@ def main():
         print('    Function demonstrated: ai_device.a_in_scan()')
         print('    Channels: ', low_channel, '-', high_channel)
         print('    Input mode: ', input_mode.name)
+        print(type(ranges[0]))
         print('    Range: ', ranges[range_index].name)
         print('    Samples per channel: ', samples_per_channel)
         print('    Rate: ', rate, 'Hz')
@@ -246,9 +247,9 @@ def clear_eol():
 
 def save_file(data_dict ):
 
-    reply = str(raw_input("Would you like to save the file?"+' (y/n): ')).lower().strip()
+    reply = str(input("Would you like to save the file?"+' (y/n): ')).lower().strip()
     if reply[0] == 'y':
-        file_name = str(raw_input("Please input save file name: ")).lower().strip()
+        file_name = str(input("Please input save file name: ")).lower().strip()
         now = datetime.now()
         dt_string = now.strftime("%m/%d/%Y %H:%M:%S")
         operator = "Sean Pluemer"
@@ -297,7 +298,7 @@ def inital_user_input():
             total_channels= (high_channel-low_channel+1)
             channel_name = {}
             for i in range(total_channels):
-                channel_name[i] = raw_input("Channel %d signal name: " % i)
+                channel_name[i] = input("Channel %d signal name: " % i)
             #    print(channel_name)
                 #while physical_units not in {"volt", "amp"}:
                 #    physical_units = raw_input("What is the physical unit (volt or amp): ")
