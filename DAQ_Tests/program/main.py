@@ -6,8 +6,8 @@ import pandas as pd
 #first step is to read the test parameters and signal configs
 
 def read_test_params():
-    signal_csv_data = pd.read_csv("/home/pi/DAQ-Website/DAQ_Tests/files_from_server/signal_config.csv",index_col=False)    #print(df)
-    test_csv_data = pd.read_csv("/home/pi/DAQ-Website/DAQ_Tests/files_from_server/test_config.csv",index_col=False) 
+    signal_csv_data = pd.read_csv("/home/pi/GitHub/DAQ-Website/DAQ_Tests/files_from_server/signal_config.csv",index_col=False)    #print(df)
+    test_csv_data = pd.read_csv("/home/pi/GitHub/DAQ-Website/DAQ_Tests/files_from_server/test_config.csv",index_col=False) 
     return signal_csv_data, test_csv_data
 #
 

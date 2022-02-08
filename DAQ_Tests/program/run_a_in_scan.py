@@ -1,3 +1,4 @@
+from asyncio import current_task
 from curses import start_color
 from turtle import st
 from uldaq import (get_daq_device_inventory, DaqDevice, AInScanFlag, ScanStatus,
@@ -46,17 +47,25 @@ def run_ain_scan(ai_device, descriptor,input_mode,ranges,daq_device, signal_csv_
 
       time_start = time.time()
 
+      dummy_var = 0
+      total_samples = test_csv_data.SamplingRate.max() * test_csv_data.TestTime.item()
 
-      while time.time() < time_start + run_time:
+      status, transfer_status = ai_device.get_scan_status()
+      current_scan = transfer_status.current_scan_count
 
+      while (total_samples >= current_scan ): 
             status, transfer_status = ai_device.get_scan_status()
             index = transfer_status.current_index
+            current_scan = transfer_status.current_scan_count
+            #print(transfer_status.current_scan_count)
+            
+            if(dummy_var != current_scan): #this means that, there has been a change in the measurmnet 
+                  dummy_var = current_scan
 
-
-            data_dict["DateTime"].append(datetime.now())
-            for i in range(channel_count):
-                        test_data = '{:.6f}'.format(data[index + i])
-                        data_dict[channel_names[i]].append('{:.6f}'.format(data[index + i]))
+                  data_dict["DateTime"].append(datetime.now())
+                  for i in range(channel_count):
+                              test_data = '{:.6f}'.format(data[index + i])
+                              data_dict[channel_names[i]].append('{:.6f}'.format(data[index + i]))
 
 
       print("while loop has eneded")
@@ -77,8 +86,8 @@ def save_file(data_dict ):
                         "ac_configuration": ac_configuration, "user_comments": user_comments, "calibration_file": calibration_file}
 
       #open text file in read mode
-      template_path = "/home/pi/DAQ-Website/DAQ_Tests/templates/output_template/output_template.dat"
-      save_path = "/home/pi/DAQ-Website/DAQ_Tests/test_data/test_results.csv"
+      template_path = "/home/pi/GitHub/DAQ-Website/DAQ_Tests/templates/output_template/output_template.dat"
+      save_path = "/home/pi/GitHub/DAQ-Website/DAQ_Tests/test_data/test_results.csv"
       try:
             with open(template_path, 'r') as f:
                   template = f.read()
