@@ -1,5 +1,6 @@
 from asyncio import current_task
 from curses import start_color
+from fcntl import I_CANPUT
 from turtle import st
 from uldaq import (get_daq_device_inventory, DaqDevice, AInScanFlag, ScanStatus,
                    ScanOption, create_float_buffer, InterfaceType, AiInputMode)
@@ -14,28 +15,31 @@ import csv
 
 
 def run_ain_scan(ai_device, descriptor,input_mode,ranges,daq_device, signal_csv_data, test_csv_data):
+
       print('Active DAQ device: ', descriptor.dev_string, ' (', descriptor.unique_id, ')\n', sep='')      
-      data = []
+ 
       samples_per_channel =   test_csv_data.SamplingRate.max() #Samples per channel is the size of buffer alloted per channel
       scan_options = ScanOption.CONTINUOUS
       flags = AInScanFlag.DEFAULT
 
-      channel_names = signal_csv_data.Signal_Name.tolist()
+      channel_names = signal_csv_data.Signal_Name.tolist() #get list of the channels
       
-      run_time = test_csv_data.TestTime.item()
-      range_index = 0
+      run_time = test_csv_data.TestTime.item() #get the total time that the code needs to run 
+      range_index = 0 # sets daq to look for 10v
+
 
 
       ai_info = ai_device.get_info()
-      ranges = ai_info.get_ranges(input_mode)
-      if range_index >= len(ranges):
-            range_index = len(ranges) - 1
+      ranges = ai_info.get_ranges(input_mode) #gets voltage ranges from DAQ, inputmode should be single_ended
 
-      channel_count = len(signal_csv_data.Channel)
-      data = create_float_buffer(channel_count, samples_per_channel)
+      channel_count = len(signal_csv_data.Channel) #count number of channels
+      data = create_float_buffer(channel_count, samples_per_channel) #makes a circular buffer, this is where the actual data is stored. 
+
+      #rate is the real measured hz
       rate = ai_device.a_in_scan(signal_csv_data.Channel.min(), signal_csv_data.Channel.max(), input_mode,
                                     ranges[range_index], samples_per_channel,
-                                    test_csv_data.SamplingRate.max(), scan_options, flags, data)
+                                    test_csv_data.SamplingRate.max(), scan_options, flags, data) 
+      #a_in_scan starts the actual measuring
 
 
       
@@ -47,28 +51,37 @@ def run_ain_scan(ai_device, descriptor,input_mode,ranges,daq_device, signal_csv_
 
       time_start = time.time()
 
-      dummy_var = 0
-      total_samples = test_csv_data.SamplingRate.max() * test_csv_data.TestTime.item()
+      last_scan_number = 0
+      total_samples = test_csv_data.SamplingRate.max() * test_csv_data.TestTime.item() #how many inputs the loop has to run, time * sample rate
 
       status, transfer_status = ai_device.get_scan_status()
-      current_scan = transfer_status.current_scan_count
+      current_scan = transfer_status.current_scan_count #this is how many "samples" per channel there have been
+      print(current_scan)
 
-      while (total_samples >= current_scan ): 
+      while (total_samples >= current_scan ): #run code until the time is up
             status, transfer_status = ai_device.get_scan_status()
-            index = transfer_status.current_index
+            index = transfer_status.current_index #index is the location its at in the buffer
             current_scan = transfer_status.current_scan_count
+            print(current_scan)
             #print(transfer_status.current_scan_count)
+            #print(rate)
             
-            if(dummy_var != current_scan): #this means that, there has been a change in the measurmnet 
-                  dummy_var = current_scan
+            '''if(last_scan_number != current_scan): #this means that, there has been a change in the measurmnet 
+            #commenting this out, because I dont think this is the correct logic 
+                  print("adding data")
+                  last_scan_number = current_scan
 
                   data_dict["DateTime"].append(datetime.now())
                   for i in range(channel_count):
                               test_data = '{:.6f}'.format(data[index + i])
                               data_dict[channel_names[i]].append('{:.6f}'.format(data[index + i]))
+            #Data is being updated always in the background. I need a way to check when its updated save the data.  '''
+            # maybe one method is to see if the current scan is = to the last scan, update the data.                  
 
 
-      print("while loop has eneded")
+
+      ai_device.scan_stop()
+
       save_file(data_dict)
 
 def save_file(data_dict ):

@@ -11,13 +11,6 @@ def read_test_params():
     return signal_csv_data, test_csv_data
 #
 
-#first step is to connect to the DAQ device
-
-
-#1/5/22 I left off here, I am trying to get the csv to save but am getting a problem having it ... ... ... the data, goes from 4 to 995
-#I will then try to store the data from a_in.py 
-#i will then filter the data from the selected channel
-
 
 def main():
     #first step is to read in test parameters, and signal. 
