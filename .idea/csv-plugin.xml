@@ -45,7 +45,7 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="/test.csv">
+        <entry key="/src/test_data_from_pi/test_results.csv">
           <value>
             <Attribute>
               <option name="separator" value=":" />
