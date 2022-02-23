@@ -11,10 +11,6 @@ Demonstration:                    Displays the analog input data for the
                                   range of user-specified channels using
                                   the first supported range and input mode
 
-
-
-
-
 Steps:
 1.  Call get_daq_device_inventory() to get the list of available DAQ devices
 2.  Create a DaqDevice object
@@ -36,9 +32,6 @@ from __future__ import print_function
 from time import sleep
 from os import system
 from sys import stdout
-from datetime import datetime
-import pandas as pd
-import time
 
 from uldaq import (get_daq_device_inventory, DaqDevice, AInScanFlag, ScanStatus,
                    ScanOption, create_float_buffer, InterfaceType, AiInputMode)
@@ -52,20 +45,12 @@ def main():
 
     range_index = 0
     interface_type = InterfaceType.ANY
+    low_channel = 0
+    high_channel = 3
+    samples_per_channel = 100
+    rate = 10
     scan_options = ScanOption.CONTINUOUS
     flags = AInScanFlag.DEFAULT
-
-    file_title = "hello world"
-    low_channel, high_channel, samples_per_channel, rate, channel_names = inital_user_input()
-    print(len(channel_names))
-
-    #making the DICT
-    data_dict = {}
-    data_dict["DateTime"] = []
-    for i in range(len(channel_names)):
-        data_dict[channel_names[i]]=[]
-
-    print(data_dict)    
 
     try:
         # Get descriptors for all of the available DAQ devices.
@@ -148,17 +133,13 @@ def main():
                                    ranges[range_index], samples_per_channel,
                                    rate, scan_options, flags, data)
 
-        long_term_data = []
-        long_term_time = []
         try:
             while True:
-            #for lmnop in range(10):
-                #print("\n LNNASDJKOFHNASDFASLDKJFHALKJSDF" , lmnop)
                 try:
                     # Get the status of the background operation
                     status, transfer_status = ai_device.get_scan_status()
 
-                    #reset_cursor()
+                    reset_cursor()
                     print('Please enter CTRL + C to terminate the process\n')
                     print('Active DAQ device: ', descriptor.dev_string, ' (',
                           descriptor.unique_id, ')\n', sep='')
@@ -173,50 +154,24 @@ def main():
                     print('currentIndex = ', index, '\n')
 
                     # Display the data.
-                    
-                    data_dict["DateTime"].append(datetime.now())
                     for i in range(channel_count):
-                        #clear_eol()
-                        print(i , channel_count, index)
+                        clear_eol()
                         print('chan =',
                               i + low_channel, ': ',
                               '{:.6f}'.format(data[index + i]))
-                        data_dict[channel_names[i]].append('{:.6f}'.format(data[index + i]))
-                      
-
-                    
-                    #print(test)
-                        
-                    
-                   
-                   #pandas_dataframe_data = pd.DataFrame.from_dict(data_dict, orient='index').transpose()
-                    #print(pandas_dataframe_data)
-
-                   
-                    
-                     
 
                     sleep(0.1)
-                except (ValueError, NameError, SyntaxError) as e:
-                    print(e)
-                    print("hello world")
-                    
+                except (ValueError, NameError, SyntaxError):
                     break
         except KeyboardInterrupt:
-            print("you pressed ctrlc")
-            save_file(data_dict)
             pass
-
 
     except RuntimeError as error:
         print('\n', error)
-        
 
     finally:
         if daq_device:
             # Stop the acquisition if it is still running.
-            
-
             if status == ScanStatus.RUNNING:
                 ai_device.scan_stop()
             if daq_device.is_connected():
@@ -243,82 +198,6 @@ def reset_cursor():
 def clear_eol():
     """Clear all characters to the end of the line."""
     stdout.write('\x1b[2K')
-
-def save_file(data_dict ):
-
-    reply = str(raw_input("Would you like to save the file?"+' (y/n): ')).lower().strip()
-    if reply[0] == 'y':
-        file_name = str(raw_input("Please input save file name: ")).lower().strip()
-        now = datetime.now()
-        dt_string = now.strftime("%m/%d/%Y %H:%M:%S")
-        operator = "Sean Pluemer"
-        station_id = "raspberry pi 1"
-        pc_name = "raspberry pi"
-        dc_configuration = "NA"
-        ac_configuration = "NA"
-        user_comments = "HELLO WORLD, THIS IS A COMMENT"
-        calibration_file = "nan"
-        #pandas_dataframe_data = pd.DataFrame([data_dict])
-        pandas_dataframe_data = pd.DataFrame.from_dict(data_dict, orient='index').transpose()
-        template_data = {"operator": operator, "station_id": station_id, "pc_name": pc_name , "dc_configuration": "dc_configuration", "ac_configuration": ac_configuration, 
-            "user_comments": user_comments, "calibration_file": calibration_file, "long_term_data": pandas_dataframe_data }
-        #template_data = {"operator": file_title, "date": dt_string, "sample_rate": sample_rate , "channels_used": str(low_channel) + " - " + str(high_channel), "samples_per_channel": samples_per_channel }
-        #open text file in read mode
-        path = "/home/pi/Templates/Detl_work/output_template/output_template.dat"
-        with open(path, 'r') as f:
-            template = f.read()
-        #text_file =  open("1st_template.txt", "r")
-        #read whole file to a stringc
-        #template = text_file.read()
-        
-        #close file
-        #text_file.close()
-
-       # print (template.format(**template_data))
-
-        f = open(file_name, "w")
-        f.write(template.format(**template_data))
-        f.close()
-    if reply[0] == 'n':
-        return False
-
-def inital_user_input():
-    while True:
-        try:
-            low_channel = int(input("Please enter the low channel: "))
-            
-            high_channel = int(input("Please enter the high channel: "))
-            if(high_channel < low_channel):
-                print("that was not a correct input, please make sure that low < high")
-                continue
-            samples_per_channel = int(input("How many samples per channel will be used: ")) 
-            rate  = int(input("Sampeling Rate: ")) 
-            physical_units = None
-            total_channels= (high_channel-low_channel+1)
-            channel_name = {}
-            for i in range(total_channels):
-                channel_name[i] = raw_input("Channel %d signal name: " % i)
-            #    print(channel_name)
-                #while physical_units not in {"volt", "amp"}:
-                #    physical_units = raw_input("What is the physical unit (volt or amp): ")
-            
-            
-            
-        except ValueError:
-            print("Sorry, I didn't understand that.")
-            continue
-
-        if (low_channel < 0):
-            print("Sorry, your response must not be negative.")
-            continue
-        else:
-            #age was successfully parsed, and we're happy with its value.
-            #we're ready to exit the loop.
-            break
-    return low_channel, high_channel, samples_per_channel, rate, channel_name
-
-
-
 
 
 if __name__ == '__main__':
