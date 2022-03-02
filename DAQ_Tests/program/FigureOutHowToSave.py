@@ -38,16 +38,21 @@ def main():
     try:
         low_channel = 0
         high_channel = 1
-        samples_per_channel = 10
-        rate = 1
-        scan_options = ScanOption.CONTINUOUS
+        samples_per_channel = 200
+        rate = 10
+        #scan_options = ScanOption.SINGLEIO
+        scan_options = ScanOption.BLOCKIO
+        #block sizes are 128 scans 
+       # scan_options = ScanOption.CONTINUOUS
+        #scan_options = ScanOption.BURSTIO
+
         channel_count = high_channel-low_channel +1
 
         data = create_float_buffer( channel_count, samples_per_channel)
         rate = ai_device.a_in_scan(low_channel,high_channel,input_mode, ranges[0], samples_per_channel, rate, scan_options, flags, data)
-        
+        i = 0
         try:
-            while True:
+            while(i<100):
                 try:
                     # Get the status of the background operation
                     status, transfer_status = ai_device.get_scan_status()
@@ -66,14 +71,22 @@ def main():
                     for i in range(2):
                         clear_eol()
                         print('chan =', i + low_channel, ': ', '{:.6f}'.format(data[index + i]))
-                        time.sleep(0.01)
-                    ai_device.scan_wait(WAIT_UNTIL_DONE= 1, 10)
+                    #time.sleep(1)
+                    #print(type(data))
+                    if status == ScanStatus.RUNNING:
+                        print('still scanning')
+                    else:
+                        print("not scanning")
+                    print(len(data))
+                    i +=1
+                    
                 except (ValueError, NameError, SyntaxError):
                             break
         except KeyboardInterrupt:
             print("Ctrl c was hit")
-            for i in data:
-                print(i)
+            print(len(data))
+            #for i in data:
+             #   print(i)
    
 
     except RuntimeError as error:
