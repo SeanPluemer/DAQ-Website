@@ -16,14 +16,9 @@ def main():
     #first step is to read in test parameters, and signal. 
     signal_csv_data, test_csv_data = read_test_params()
     print(test_csv_data)
-
-
+    
     daq_device = None 
     ai_device, descriptor, input_mode,ranges,daq_device = connect_to_daq.connect(0) #todo, need to find which daq device from server
-
-
-    #run_a_in.run_ain(ai_device,descriptor,input_mode,ranges,daq_device, channel_names, run_time, sampling_rate) 
-
 
     run_a_in_scan.run_ain_scan(ai_device,descriptor,input_mode,ranges,daq_device, signal_csv_data, test_csv_data) 
 

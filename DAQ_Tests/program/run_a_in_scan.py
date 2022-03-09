@@ -19,19 +19,14 @@ import os
 
 def run_ain_scan(ai_device, descriptor,input_mode,ranges,daq_device, signal_csv_data, test_csv_data):
       print('Active DAQ device: ', descriptor.dev_string, ' (', descriptor.unique_id, ')\n', sep='')      
-      print("here")
-      samples_per_channel =    test_csv_data.SamplingRate.max()*2 #Samples per channel is the size of buffer alloted per channel
+      run_time = test_csv_data.TestTime.item() #get the total time that the code needs to run 
+
+      samples_per_channel =    test_csv_data.SamplingRate.max()*run_time #Samples per channel is the size of buffer alloted per channel
       scan_options = ScanOption.BLOCKIO
       flags = AInScanFlag.DEFAULT
-      
 
-      channel_names = signal_csv_data.Signal_Name.tolist() #get list of the channels
-      
-      run_time = test_csv_data.TestTime.item() #get the total time that the code needs to run 
+      channel_names = signal_csv_data.Signal_Name.tolist() #get list of the channels      
       range_index = 0 # sets daq to look for 10v
-
-
-
       ai_info = ai_device.get_info()
       ranges = ai_info.get_ranges(input_mode) #gets voltage ranges from DAQ, inputmode should be single_ended
 
@@ -43,27 +38,21 @@ def run_ain_scan(ai_device, descriptor,input_mode,ranges,daq_device, signal_csv_
                                     ranges[range_index], samples_per_channel,
                                     test_csv_data.SamplingRate.max(), scan_options, flags, data) #
       #a_in_scan starts the actual measuring
-      print(len(data), channel_count)
       status, transfer_status = ai_device.get_scan_status()
       while (status == ScanStatus.RUNNING): #run code until the time is up
             status, transfer_status = ai_device.get_scan_status()
             os.system('cls||clear')
+            print("Real Rate = ", rate, "Hz")
             print('currentTotalCount = ', transfer_status.current_total_count)
             print('currentScanCount = ', transfer_status.current_scan_count)
             print('currentIndex = ', transfer_status.current_index, '\n')
             time.sleep(0.5)
-            for i in range(2):
-                        clear_eol()
-                        print('chan =', i + signal_csv_data.Channel.min(), ': ', '{:.6f}'.format(data[transfer_status.current_index + i]))
-
 
       ai_device.scan_stop()
-
       save_file(data)
 
 def save_file(data ):
       print(type(data))
-
       operator = "Sean Pluemer"
       station_id = "raspberry pi 1"
       pc_name = "raspberry pi"
@@ -88,18 +77,12 @@ def save_file(data ):
             with open(save_path, 'a', newline='') as csvfile: #todo, figure how to seperate the 2 channels 
                   writer = csv.writer(csvfile)
                   for i in range(0, len(data), 2):
-                        print(data[i])
                         test = []
                         test.append(data[i])
                         test.append(data[i+1])
                         writer.writerow(test)
-
-
-
       except Exception  as e:
-            
             print("something failed in saaving", e)
-
       print("Save Completed")
 
 def reset_cursor():
