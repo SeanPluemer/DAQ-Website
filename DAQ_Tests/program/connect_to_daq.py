@@ -1,6 +1,7 @@
 from uldaq import (get_daq_device_inventory, DaqDevice, AInScanFlag, ScanStatus,
                    ScanOption, create_float_buffer, InterfaceType, AiInputMode, AInFlag)
 interface_type = InterfaceType.ANY
+import time
 
 def view_daq_devices():
     devices = get_daq_device_inventory(interface_type)
@@ -42,13 +43,16 @@ def connect(descriptor_index):
             # If SINGLE_ENDED input mode is not supported, set to DIFFERENTIAL.
             if ai_info.get_num_chans_by_mode(AiInputMode.SINGLE_ENDED) <= 0:
                 input_mode = AiInputMode.DIFFERENTIAL
+                print("HELLO MY INPUT MODE HAS CHANGED")
+
+
+                
         # Get a list of supported ranges and validate the range index.
             ranges = ai_info.get_ranges(input_mode)
             if range_index >= len(ranges):
                 range_index = len(ranges) - 1
 
             print('\n', descriptor.dev_string, ' Connected and Ready', sep='')
-            print(ai_device)
           
             return ai_device, descriptor, input_mode, ranges, daq_device
 

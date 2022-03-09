@@ -1,0 +1,11 @@
+Operator:	{operator}
+Station ID:	{station_id}
+PC Name:	{pc_name}
+DC Configuration:	{dc_configuration}
+AC Configuration:	{dc_configuration}
+
+Comments: {user_comments}
+
+Calibration File:	{calibration_file}
+Output Data:
+
