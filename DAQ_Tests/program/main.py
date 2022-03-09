@@ -1,8 +1,11 @@
 #the goal of this code is to be the central location for all of the DETL DAQ software
-from os import terminal_size
+import os
 from typing_extensions import runtime
 import connect_to_daq, run_a_in, run_a_in_scan
 import pandas as pd
+import sys
+import time
+import main_waveform
 #first step is to read the test parameters and signal configs
 
 def read_test_params():
@@ -21,7 +24,7 @@ def main():
     ai_device, descriptor, input_mode,ranges,daq_device = connect_to_daq.connect(0) #todo, need to find which daq device from server
 
     run_a_in_scan.run_ain_scan(ai_device,descriptor,input_mode,ranges,daq_device, signal_csv_data, test_csv_data) 
-
+    main_waveform.main()
 
 if __name__ == "__main__":
     main()
