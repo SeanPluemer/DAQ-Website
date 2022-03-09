@@ -12,15 +12,18 @@ import pandas as pd
 import time
 import sys
 import csv
+from sys import stdout
+import os
+
 
 
 def run_ain_scan(ai_device, descriptor,input_mode,ranges,daq_device, signal_csv_data, test_csv_data):
-
       print('Active DAQ device: ', descriptor.dev_string, ' (', descriptor.unique_id, ')\n', sep='')      
- 
-      samples_per_channel =   test_csv_data.SamplingRate.max() #Samples per channel is the size of buffer alloted per channel
-      scan_options = ScanOption.CONTINUOUS
+      print("here")
+      samples_per_channel =    test_csv_data.SamplingRate.max()*2 #Samples per channel is the size of buffer alloted per channel
+      scan_options = ScanOption.BLOCKIO
       flags = AInScanFlag.DEFAULT
+      
 
       channel_names = signal_csv_data.Signal_Name.tolist() #get list of the channels
       
@@ -38,54 +41,28 @@ def run_ain_scan(ai_device, descriptor,input_mode,ranges,daq_device, signal_csv_
       #rate is the real measured hz
       rate = ai_device.a_in_scan(signal_csv_data.Channel.min(), signal_csv_data.Channel.max(), input_mode,
                                     ranges[range_index], samples_per_channel,
-                                    test_csv_data.SamplingRate.max(), scan_options, flags, data) 
+                                    test_csv_data.SamplingRate.max(), scan_options, flags, data) #
       #a_in_scan starts the actual measuring
-
-
-      
-      #making the DICT
-      data_dict = {}
-      data_dict["DateTime"] = []
-      for i in range(len(channel_names)):
-            data_dict[channel_names[i]]=[]
-
-      time_start = time.time()
-
-      last_scan_number = 0
-      total_samples = test_csv_data.SamplingRate.max() * test_csv_data.TestTime.item() #how many inputs the loop has to run, time * sample rate
-
+      print(len(data), channel_count)
       status, transfer_status = ai_device.get_scan_status()
-      current_scan = transfer_status.current_scan_count #this is how many "samples" per channel there have been
-      print(current_scan)
-
-      while (total_samples >= current_scan ): #run code until the time is up
+      while (status == ScanStatus.RUNNING): #run code until the time is up
             status, transfer_status = ai_device.get_scan_status()
-            index = transfer_status.current_index #index is the location its at in the buffer
-            current_scan = transfer_status.current_scan_count
-            print(current_scan)
-            #print(transfer_status.current_scan_count)
-            #print(rate)
-            
-            '''if(last_scan_number != current_scan): #this means that, there has been a change in the measurmnet 
-            #commenting this out, because I dont think this is the correct logic 
-                  print("adding data")
-                  last_scan_number = current_scan
-
-                  data_dict["DateTime"].append(datetime.now())
-                  for i in range(channel_count):
-                              test_data = '{:.6f}'.format(data[index + i])
-                              data_dict[channel_names[i]].append('{:.6f}'.format(data[index + i]))
-            #Data is being updated always in the background. I need a way to check when its updated save the data.  '''
-            # maybe one method is to see if the current scan is = to the last scan, update the data.                  
-
+            os.system('cls||clear')
+            print('currentTotalCount = ', transfer_status.current_total_count)
+            print('currentScanCount = ', transfer_status.current_scan_count)
+            print('currentIndex = ', transfer_status.current_index, '\n')
+            time.sleep(0.5)
+            for i in range(2):
+                        clear_eol()
+                        print('chan =', i + signal_csv_data.Channel.min(), ': ', '{:.6f}'.format(data[transfer_status.current_index + i]))
 
 
       ai_device.scan_stop()
 
-      save_file(data_dict)
+      save_file(data)
 
-def save_file(data_dict ):
-      print(sys.getsizeof(data_dict))
+def save_file(data ):
+      print(type(data))
 
       operator = "Sean Pluemer"
       station_id = "raspberry pi 1"
@@ -108,15 +85,30 @@ def save_file(data_dict ):
                   f.write(template.format(**template_data))
                   f.close()
       
-            with open(save_path, 'a', newline='') as csvfile:
-                  writer = csv.DictWriter(csvfile, data_dict.keys())
-                  writer.writeheader()
-                  for i in range(len(list(data_dict.values())[0])):
-                        writer.writerow({key:data_dict[key][i] for key in data_dict.keys()}) 
-      except:
-            print("something failed in saaving")
+            with open(save_path, 'a', newline='') as csvfile: #todo, figure how to seperate the 2 channels 
+                  writer = csv.writer(csvfile)
+                  for i in range(0, len(data), 2):
+                        print(data[i])
+                        test = []
+                        test.append(data[i])
+                        test.append(data[i+1])
+                        writer.writerow(test)
+
+
+
+      except Exception  as e:
+            
+            print("something failed in saaving", e)
 
       print("Save Completed")
+
+def reset_cursor():
+    """Reset the cursor in the terminal window."""
+    stdout.write('\033[1;1H')
+
+def clear_eol():
+    """Clear all characters to the end of the line."""
+    stdout.write('\x1b[2K')
 
 if __name__ == '__main__':
     print("Run_a_in.py was run directly for some reason?")

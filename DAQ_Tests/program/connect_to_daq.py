@@ -53,7 +53,6 @@ def connect(descriptor_index):
                 range_index = len(ranges) - 1
 
             print('\n', descriptor.dev_string, ' Connected and Ready', sep='')
-            print(ai_device)
           
             return ai_device, descriptor, input_mode, ranges, daq_device
 

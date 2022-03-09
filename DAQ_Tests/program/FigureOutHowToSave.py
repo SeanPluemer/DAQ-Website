@@ -38,10 +38,10 @@ def main():
     try:
         low_channel = 0
         high_channel = 1
-        samples_per_channel = 200
-        rate = 10
-        #scan_options = ScanOption.SINGLEIO
-        scan_options = ScanOption.BLOCKIO
+        samples_per_channel = 2000
+        rate = 100
+        scan_options = ScanOption.SINGLEIO
+        #scan_options = ScanOption.BLOCKIO
         #block sizes are 128 scans 
        # scan_options = ScanOption.CONTINUOUS
         #scan_options = ScanOption.BURSTIO
@@ -77,6 +77,7 @@ def main():
                         print('still scanning')
                     else:
                         print("not scanning")
+                    time.sleep(1)
                     print(len(data))
                     i +=1
                     
