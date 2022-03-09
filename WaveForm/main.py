@@ -517,6 +517,7 @@ def harmonic_analysis(t, V, I, sampling_rate, ts):
 if __name__ == "__main__":
 
     t, V, I = np.loadtxt('FRONIUS_Node_10_1.csv', delimiter=',', unpack=True)
+    t, V, I = np.loadtxt('test.csv', delimiter=',', unpack=True)
 
     P = V*I
     w = 2*np.pi
