@@ -45,7 +45,6 @@ try:
     import script
 
 except Exception as e:
-    print("NumPy is not installed")
 
     print(e)  # This will appear in the SVP log file.
 
@@ -309,7 +308,7 @@ def pf_from_waveform(t, V, I, sampling_rate, ts):
     pass
 
 
-def harmonic_analysis(t, V, I, sampling_rate, ts):
+def harmonic_analysis(t, V, I, sampling_rate):#todo, removed ts
     """
     :param t: time vector (numpy)
     :param V: voltage vector (numpy)
@@ -470,7 +469,8 @@ def harmonic_analysis(t, V, I, sampling_rate, ts):
         else:
             PH += powers[1][i]  # real power from harmonics
     if Q1 is None:
-        ts.log_warning('No fundamental frequency for given capture timing parameters. Will not calculate P1 or Q1.')
+        print("No fundamental frequency for given capture timing parameters. Will not calculate P1 or Q1.")
+        #ts.log_warning('No fundamental frequency for given capture timing parameters. Will not calculate P1 or Q1.')
 
     # Fundamental Apparent Power
     S1 = np.sqrt(np.square(P1)+np.square(Q1))
@@ -513,16 +513,15 @@ def harmonic_analysis(t, V, I, sampling_rate, ts):
 
     # ts.log_debug('Time to complete harmonic analysis = %s' % (time.time() - harmonic_start))
 
-    # return avg_P, P1, PH, N, Q1, DI, DV, DH, S, S1, SN, SH, PF1, PF, har_poll, THD_V, THD_I
-    return avg_P, S, Q1, N, PF1
+    return avg_P, P1, PH, N, Q1, DI, DV, S, S1, SN, SH, PF1, PF, THD_V, THD_I
+    #return avg_P, S, Q1, N, PF1, PF
 
 def main():
+    import time
     #t, V, I = np.loadtxt('FRONIUS_Node_10_1.csv', delimiter=',', unpack=True)
     t, V, I = np.loadtxt('/home/pi/GitHub/DAQ-Website/WaveForm/test.csv', delimiter=',', unpack=True)
-
     P = V*I
     w = 2*np.pi
-
     Fs = 10000
     ffI = np.fft.fft(I, len(t))
     ffV = np.fft.fft(V, len(t))
@@ -534,15 +533,15 @@ def main():
 
     # Plot harmonics of current and voltage
 
-    plt.subplot(4, 1, 2)
-    plt.plot(xfft2,abs(ffI2)*2/len(ffI), label='current harmonics')
-    plt.grid()
-    plt.legend()
-    plt.subplot(4, 1, 4)
-    plt.plot(xfft2, abs(ffV2)*2/len(ffV), label='voltage harmonics')
-    plt.grid()
-    plt.legend()
-    plt.show()
+    # plt.subplot(4, 1, 2)
+    # plt.plot(xfft2,abs(ffI2)*2/len(ffI), label='current harmonics')
+    # plt.grid()
+    # plt.legend()
+    # plt.subplot(4, 1, 4)
+    # plt.plot(xfft2, abs(ffV2)*2/len(ffV), label='voltage harmonics')
+    # plt.grid()
+    # plt.legend()
+    # plt.show()
 
     # lists with harmonic content harmonicsVI = [[n],[complex/norm],[abs/norm],[phase]] = [[0],[1],[2],[3]]
     # [0] = n
@@ -574,7 +573,9 @@ def main():
     harmonicsV[2][0] = abs(np.real(harmonicsV[1][0]))
 
     # synthesis
+    print(len(t))
     for i in range(len(t)):
+        print(i)
         acumI = 0.0
         acumV = 0.0
         for k in range(1,len(harmonicsI[0])):
@@ -585,7 +586,7 @@ def main():
         recoverI += [acumI]
         recoverV += [acumV]
 
-    plt.subplot(4, 1, 1)
+    """ plt.subplot(4, 1, 1)
     plt.plot(t, I, label='original')
     plt.plot(t, recoverI, label='recovered')
     plt.xlim(0, 0.1)
@@ -598,7 +599,7 @@ def main():
     plt.xlim(0,0.1)
     plt.grid()
     plt.legend()
-    plt.show()
+    plt.show() """
 
     ###############################################################################
     ################ CALCULATIONS ACCORDING TO IEEE 1459 ##########################
@@ -625,6 +626,7 @@ def main():
             powers[2] += [0]
 
         elif harmonicsV[0][i]*Fs/len(t)==60:
+            print("hello! I am called ", i)
             #THDs
             V1sq = np.square(harmonicsV[2][i])/2
             I1sq = np.square(harmonicsI[2][i])/2

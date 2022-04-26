@@ -18,13 +18,16 @@ def read_test_params():
 def main():
     #first step is to read in test parameters, and signal. 
     signal_csv_data, test_csv_data = read_test_params()
+    if not (len(signal_csv_data) % 2 ==0):
+        sys.exit("signal data needs to be an even input")
+
     print(test_csv_data)
     
     daq_device = None 
     ai_device, descriptor, input_mode,ranges,daq_device = connect_to_daq.connect(0) #todo, need to find which daq device from server
 
-    run_a_in_scan.run_ain_scan(ai_device,descriptor,input_mode,ranges,daq_device, signal_csv_data, test_csv_data) 
-    main_waveform.main()
+    run_a_in_scan.run_ain_scan_continuous(ai_device,descriptor,input_mode,ranges,daq_device, signal_csv_data, test_csv_data) 
+    #main_waveform.main()
 
 if __name__ == "__main__":
     main()

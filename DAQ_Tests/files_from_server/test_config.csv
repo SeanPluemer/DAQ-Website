@@ -1,2 +1,2 @@
 ﻿SamplingRate,NumOfAvg,UpdateRate,RecRate,RecRateUnits,RecMode,TestTime,FileStats,AllStats,Notes
-100000,1,10,Continuous,1,Continuous,10,,hello world
+100,100,30,15,Seconds/Update,Continuous,61,,,,
